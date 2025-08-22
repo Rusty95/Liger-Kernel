@@ -6,7 +6,7 @@ except ImportError:
     PEFT_AVAILABLE = False
 
 import torch
-
+import torch_npu
 
 def is_peft_available():
     return PEFT_AVAILABLE
@@ -20,6 +20,8 @@ def infer_device():
         return "cuda"
     elif torch.xpu.is_available():
         return "xpu"
+    elif torch_npu.npu.is_available():
+        return "npu"
     else:
         return "cpu"
 

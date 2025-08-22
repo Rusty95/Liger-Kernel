@@ -3,6 +3,7 @@ import operator
 from typing import Optional
 
 import torch
+import torch_npu
 import triton
 import triton.language as tl
 
@@ -21,6 +22,8 @@ if compare_version("triton", operator.ge, "3.0.0"):
 else:
     from triton.language.math import tanh
 
+if torch_npu.npu.is_available():
+    from triton.language.math import tanh
 
 @triton.jit
 def liger_cross_entropy_kernel(

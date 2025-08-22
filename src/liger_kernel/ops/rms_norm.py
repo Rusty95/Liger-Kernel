@@ -14,6 +14,7 @@ import math
 import operator
 
 import torch
+import torch_npu
 import triton
 import triton.language as tl
 
@@ -32,6 +33,8 @@ if compare_version("triton", operator.ge, "3.0.0"):
 else:
     from triton.language.math import rsqrt
 
+if torch_npu.npu.is_available():
+    from triton.language.math import rsqrt
 
 _CASTING_MODE_NONE: tl.constexpr = tl.constexpr(-1)
 _CASTING_MODE_LLAMA: tl.constexpr = tl.constexpr(0)

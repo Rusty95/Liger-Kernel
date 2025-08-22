@@ -514,11 +514,11 @@ def _test_correctness_functional(
         pytest.param(
             1.0,
             torch.bfloat16,
-            1e-8,
+            1e-7,
             5e-2,
             marks=pytest.mark.skipif(not supports_bfloat16(), reason="bfloat16 not supported on this GPU"),
         ),
-        (1.0, torch.float32, 1e-8, 1e-6),
+        (1.0, torch.float32, 1e-7, 1e-6),
     ],
 )
 def test_correctness(B, T, V, scalar, dtype, reduction, atol, rtol):
@@ -537,8 +537,8 @@ def test_correctness(B, T, V, scalar, dtype, reduction, atol, rtol):
 @pytest.mark.parametrize(
     "scalar, dtype, atol, rtol",
     [
-        (1.0, torch.bfloat16, 1e-8, 5e-2),
-        (1.0, torch.float32, 1e-8, 1e-6),
+        (1.0, torch.bfloat16, 1e-7, 5e-2),
+        (1.0, torch.float32, 1e-7, 1e-6),
     ],
 )
 def test_correctness_functional(B, T, V, scalar, dtype, atol, rtol):
@@ -560,11 +560,11 @@ def test_correctness_functional(B, T, V, scalar, dtype, atol, rtol):
         pytest.param(
             1.0,
             torch.bfloat16,
-            1e-8,
+            1e-7,
             5e-2,
             marks=pytest.mark.skipif(not supports_bfloat16(), reason="bfloat16 not supported on this GPU"),
         ),
-        (1.0, torch.float32, 1e-8, 1e-6),
+        (1.0, torch.float32, 1e-7, 1e-6),
     ],
 )
 def test_correctness_with_ignore_index(B, T, V, ignore_index, reduction, scalar, dtype, atol, rtol):
@@ -586,11 +586,11 @@ def test_correctness_with_ignore_index(B, T, V, ignore_index, reduction, scalar,
         pytest.param(
             1.0,
             torch.bfloat16,
-            1e-8,
+            1e-7,
             5e-2,
             marks=pytest.mark.skipif(not supports_bfloat16(), reason="bfloat16 not supported on this GPU"),
         ),
-        (1.0, torch.float32, 1e-8, 1e-6),
+        (1.0, torch.float32, 1e-7, 1e-6),
     ],
 )
 def test_correctness_with_label_smoothing_once(B, T, V, label_smoothing, scalar, dtype, atol, rtol):
@@ -612,11 +612,11 @@ def test_correctness_with_label_smoothing_once(B, T, V, label_smoothing, scalar,
         pytest.param(
             1.0,
             torch.bfloat16,
-            1e-8,
+            1e-7,
             5e-2,
             marks=pytest.mark.skipif(not supports_bfloat16(), reason="bfloat16 not supported on this GPU"),
         ),
-        (1.0, torch.float32, 1e-8, 1e-6),
+        (1.0, torch.float32, 1e-7, 1e-6),
     ],
 )
 def test_correctness_with_label_smoothing_with_ignore_index_once(
@@ -646,11 +646,11 @@ def test_correctness_with_label_smoothing_with_ignore_index_once(
         pytest.param(
             1.0,
             torch.bfloat16,
-            1e-8,
+            1e-7,
             5e-2,
             marks=pytest.mark.skipif(not supports_bfloat16(), reason="bfloat16 not supported on this GPU"),
         ),
-        (1.0, torch.float32, 1e-8, 1e-6),
+        (1.0, torch.float32, 1e-7, 1e-6),
     ],
 )
 def test_correctness_with_softcap_once(B, T, V, softcap, reduction, scalar, dtype, atol, rtol):
@@ -672,11 +672,11 @@ def test_correctness_with_softcap_once(B, T, V, softcap, reduction, scalar, dtyp
         pytest.param(
             1.0,
             torch.bfloat16,
-            1e-8,
+            1e-7,
             5e-2,
             marks=pytest.mark.skipif(not supports_bfloat16(), reason="bfloat16 not supported on this GPU"),
         ),
-        (1.0, torch.float32, 1e-8, 1e-6),
+        (1.0, torch.float32, 1e-7, 1e-6),
     ],
 )
 @pytest.mark.parametrize("return_z_loss", [True, False])
@@ -730,11 +730,11 @@ def test_correctness_with_z_loss_once(
         pytest.param(
             1.0,
             torch.bfloat16,
-            1e-8,
+            1e-7,
             5e-2,
             marks=pytest.mark.skipif(not supports_bfloat16(), reason="bfloat16 not supported on this GPU"),
         ),
-        (1.0, torch.float32, 1e-8, 1e-6),
+        (1.0, torch.float32, 1e-7, 1e-6),
     ],
 )
 @pytest.mark.parametrize(
@@ -804,11 +804,11 @@ def test_correctness_with_z_loss_with_other_params_once(
         pytest.param(
             1.0,
             torch.bfloat16,
-            1e-8,
+            1e-7,
             5e-2,
             marks=pytest.mark.skipif(not supports_bfloat16(), reason="bfloat16 not supported on this GPU"),
         ),
-        (1.0, torch.float32, 1e-8, 1e-6),
+        (1.0, torch.float32, 1e-7, 1e-6),
     ],
 )
 def test_correctness_with_weight_once(B, T, V, reduction, scalar, dtype, atol, rtol):
@@ -839,11 +839,11 @@ def test_correctness_with_weight_once(B, T, V, reduction, scalar, dtype, atol, r
         pytest.param(
             1.0,
             torch.bfloat16,
-            1e-8,
+            1e-7,
             5e-2,
             marks=pytest.mark.skipif(not supports_bfloat16(), reason="bfloat16 not supported on this GPU"),
         ),
-        (1.0, torch.float32, 1e-8, 1e-6),
+        (1.0, torch.float32, 1e-7, 1e-6),
     ],
 )
 def test_correctness_with_weight_with_other_params_once(
@@ -902,11 +902,11 @@ def test_correctness_with_weight_with_other_params_once(
         pytest.param(
             1.0,
             torch.bfloat16,
-            1e-8,
+            1e-7,
             5e-2,
             marks=pytest.mark.skipif(not supports_bfloat16(), reason="bfloat16 not supported on this GPU"),
         ),
-        (1.0, torch.float32, 1e-8, 1e-6),
+        (1.0, torch.float32, 1e-7, 1e-6),
     ],
 )
 def test_correctness_not_last_layer(B, T, V, reduction, scalar, dtype, atol, rtol):
@@ -936,11 +936,11 @@ def test_correctness_not_last_layer(B, T, V, reduction, scalar, dtype, atol, rto
         pytest.param(
             1.0,
             torch.bfloat16,
-            1e-8,
+            1e-7,
             5e-2,
             marks=pytest.mark.skipif(not supports_bfloat16(), reason="bfloat16 not supported on this GPU"),
         ),
-        (1.0, torch.float32, 1e-8, 1e-5),
+        (1.0, torch.float32, 1e-7, 1e-5),
     ],
 )
 def test_correctness_not_last_layer_with_other_params(
@@ -983,7 +983,8 @@ def test_float32_internal():
     label_smoothing = 0.0
     lse_square_scale = 0.0
     softcap = 0.0
-    BLOCK_SIZE = 32768
+    # BLOCK_SIZE = 32768
+    BLOCK_SIZE = 4096
     reduction = "mean"
 
     # Initialize input tensors

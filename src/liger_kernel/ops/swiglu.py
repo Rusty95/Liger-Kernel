@@ -20,14 +20,16 @@ def _swiglu_forward_kernel(a_ptr, b_ptr, c_ptr, stride, n_cols: tl.constexpr, BL
     b_ptr += program_id * stride
     c_ptr += program_id * stride
 
-    col_offsets = tl.arange(0, BLOCK_SIZE)
-    mask = col_offsets < n_cols
+    base_offsets = tl.arange(0, BLOCK_SIZE)
+    for i in range(0, n_cols, BLOCK_SIZE):
+        col_offsets = base_offsets + i
+        mask = col_offsets < n_cols
 
-    # sigmoid requires type float32
-    a_row = tl.load(a_ptr + col_offsets, mask=mask, other=0).to(tl.float32)
-    b_row = tl.load(b_ptr + col_offsets, mask=mask, other=0)
-    c_row = silu(a_row).cast(b_row.dtype) * b_row
-    tl.store(c_ptr + col_offsets, c_row, mask=mask)
+        # sigmoid requires type float32
+        a_row = tl.load(a_ptr + col_offsets, mask=mask, other=0).to(tl.float32)
+        b_row = tl.load(b_ptr + col_offsets, mask=mask, other=0)
+        c_row = silu(a_row).cast(b_row.dtype) * b_row
+        tl.store(c_ptr + col_offsets, c_row, mask=mask)
 
 
 @triton.jit
@@ -39,22 +41,24 @@ def _swiglu_backward_kernel(dc_ptr, a_ptr, b_ptr, stride, n_cols: tl.constexpr, 
     a_ptr += program_id * stride
     b_ptr += program_id * stride
 
-    col_offsets = tl.arange(0, BLOCK_SIZE)
-    mask = col_offsets < n_cols
+    base_offsets = tl.arange(0, BLOCK_SIZE)
+    for i in range(0, n_cols, BLOCK_SIZE):
+        col_offsets = base_offsets + i
+        mask = col_offsets < n_cols
 
-    dc_row = tl.load(dc_ptr + col_offsets, mask=mask, other=0)
-    # sigmoid requires type float32
-    a_row = tl.load(a_ptr + col_offsets, mask=mask, other=0).to(tl.float32)
-    b_row = tl.load(b_ptr + col_offsets, mask=mask, other=0)
+        dc_row = tl.load(dc_ptr + col_offsets, mask=mask, other=0)
+        # sigmoid requires type float32
+        a_row = tl.load(a_ptr + col_offsets, mask=mask, other=0).to(tl.float32)
+        b_row = tl.load(b_ptr + col_offsets, mask=mask, other=0)
 
-    # recomputation to save memory
-    sig_a = tl.sigmoid(a_row)
-    silu_a = a_row * sig_a
-    db_row = dc_row * silu_a
-    da_row = dc_row * (silu_a * (1 - sig_a) + sig_a) * b_row
+        # recomputation to save memory
+        sig_a = tl.sigmoid(a_row)
+        silu_a = a_row * sig_a
+        db_row = dc_row * silu_a
+        da_row = dc_row * (silu_a * (1 - sig_a) + sig_a) * b_row
 
-    tl.store(a_ptr + col_offsets, da_row, mask=mask)
-    tl.store(b_ptr + col_offsets, db_row, mask=mask)
+        tl.store(a_ptr + col_offsets, da_row, mask=mask)
+        tl.store(b_ptr + col_offsets, db_row, mask=mask)
 
 
 def swiglu_forward(a, b):
@@ -66,8 +70,9 @@ def swiglu_forward(a, b):
     c = torch.empty_like(a)
     n_rows = a.shape[0]
 
-    BLOCK_SIZE, num_warps = calculate_settings(n_cols)
-
+    # BLOCK_SIZE, num_warps = calculate_settings(n_cols)
+    BLOCK_SIZE = min(6144, triton.next_power_of_2(n_cols))
+    
     _swiglu_forward_kernel[(n_rows,)](
         a,
         b,
@@ -75,7 +80,7 @@ def swiglu_forward(a, b):
         c.stride(-2),
         n_cols=n_cols,
         BLOCK_SIZE=BLOCK_SIZE,
-        num_warps=num_warps,
+        # num_warps=num_warps,
     )
     return a, b, c.view(*ori_shape)
 
@@ -86,7 +91,8 @@ def swiglu_backward(a, b, dc):
     dc = dc.view(-1, n_cols)
     n_rows = dc.shape[0]
 
-    BLOCK_SIZE, num_warps = calculate_settings(n_cols)
+    # BLOCK_SIZE, num_warps = calculate_settings(n_cols)
+    BLOCK_SIZE = min(6144, triton.next_power_of_2(n_cols))
 
     _swiglu_backward_kernel[(n_rows,)](
         dc,
@@ -95,7 +101,7 @@ def swiglu_backward(a, b, dc):
         dc.stride(-2),
         n_cols=n_cols,
         BLOCK_SIZE=BLOCK_SIZE,
-        num_warps=num_warps,
+        # num_warps=num_warps,
     )
     return a.view(*ori_shape), b.view(*ori_shape)
 

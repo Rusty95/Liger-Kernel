@@ -84,6 +84,7 @@ def liger_cross_entropy_kernel(
     # 1. Load Y_ptr first because if the target is ignore_index, we can return right away
     Y_ptr += program_id * Y_stride
     y = tl.load(Y_ptr)
+    y = y.to(tl.int32)
 
     # 2. locate the start index
     X_ptr += program_id * X_stride
@@ -263,7 +264,7 @@ def liger_cross_entropy_kernel(
 # However, setting limit as 65536 as in LayerNorm tutorial is faster because of less register spilling
 # The optimal maximum block size depends on your hardware, your kernel, and your dtype
 MAX_FUSED_SIZE = 4096 if infer_device() == "xpu" else 65536 // 2  # the best size we found by manually tuning
-MAX_FUSED_SIZE = 256 if infer_device() == "npu" else MAX_FUSED_SIZE
+MAX_FUSED_SIZE = 2048 if infer_device() == "npu" else MAX_FUSED_SIZE
 
 def cross_entropy_forward(
     _input,
